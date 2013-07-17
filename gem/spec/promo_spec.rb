@@ -117,7 +117,7 @@ describe Promo do
 			optin.company_name.should_not == company_name
 
 			stub_request(:put, url)
-				.with(:body => {params: {email: email, params:{company_name: company_name}}})
+				.with(:body => {email: email, params:{company_name: company_name}})
 				.to_return(:body => response, :status => 200)
 
 			optin.update(:company_name => company_name)
@@ -144,7 +144,7 @@ describe Promo do
 			optin.company_name.should_not == company_name
 
 			stub_request(:put, url)
-				.with(:body => {params: {email: email, params:{company_name: company_name}}})
+				.with(:body => {email: email, params:{company_name: company_name}})
 				.to_return(:body => "company_name can't be blank", :status => 422)
 
 			optin.update(:company_name => "")

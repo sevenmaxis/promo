@@ -6,12 +6,12 @@ module Promo
 
   class Optin
 
-    attrs = [
+    @@attrs = [
       :status, :message, :email, :mobile, :first_name,
       :last_name, :permission_type, :channel, :company_name 
     ]
 
-    attr_accessor *attrs
+    attr_accessor *@@attrs
 
     class << self
 
@@ -20,13 +20,13 @@ module Promo
       end
 
       def get(email)
-        resp = process_request do 
+        resp = process_response do 
           # '/1' is a fake id to follow REST convention
-          RestClient.get(@@url+'/1', params: {email: email}) do |response, request, result, &block|
+          response = RestClient.get(@@url+'/1', params: {email: email}) do |response, request, result, &block|
             if 200 == response.code
               response
             elsif [404, 422].include? response.code
-              [response.code, response]
+              response
             else
               response.return!(request, result, &block)
             end
@@ -40,12 +40,12 @@ module Promo
           email: email, mobile: mobile, first_name: first_name, last_name: last_name, 
           permission_type: permission_type, channel: channel, company_name: company_name 
         }
-        resp = process_request do 
-          RestClient.post(@@url, :params => params) do |response, request, result, &block|
+        resp = process_response do 
+          response = RestClient.post(@@url, :params => params) do |response, request, result, &block|
             if 200 == response.code
               response
             elsif [404, 422].include? response.code
-              [response.code, response]
+              response
             else
               response.return!(request, result, &block)
             end
@@ -55,14 +55,14 @@ module Promo
       end
 
       def update(email, params)
-        process_request do
-          options = {params: {email: email, params: params}}
+        process_response do
+          options = {email: email, params: params}
           # '/1' is a fake id to follow REST convention
-          RestClient.put(@@url+'/1', options) do |response, request, result, &block|
+          response = RestClient.put(@@url+'/1', options) do |response, request, result, &block|
             if 200 == response.code
               response
             elsif [404, 422].include? response.code
-              [response.code, response]
+              response
             else
               response.return!(request, result, &block)
             end
@@ -70,24 +70,26 @@ module Promo
         end
       end
 
-      def process_request      
+      def process_response      
         resp = yield
         if [200, 201].include? resp.code
-          ['success', resp.body]
+          result = ['success', resp.body]
         elsif [404, 422].include? resp.code
-          ['error'. resp.body]
+          result = ['error', resp.body]
         else
-          ['error', "unrecognized error,\nhttp code: #{resp.code},\nhttp body: #{resp.body}"]
+          result = ['error', "unrecognized error,\nhttp code: #{resp.code},\nhttp body: #{resp.body}"]
         end
       rescue RestClient::RequestFailed, RestClient::ResourceNotFound, RestClient::Unauthorized,  RestClient::NotModified, StandardError => e
-        ['error', e.message]
+        result = ['error', e.message]
       end
 
       def create_optin(status, body)
         new.tap do |optin|
           if (optin.status = status) == 'success'
             optin.message = ""
-            JSON.parse(body).each { |attr, value| optin.send("#{attr}=", value) }
+            JSON.parse(body).each do |attr, value|
+              optin.send("#{attr}=", value) if @@attrs.include? attr.to_sym
+            end
           else
             optin.message = body
           end
@@ -106,6 +108,6 @@ module Promo
       self
     end
 
-    private_class_method :new, :process_request, :create_optin
+    private_class_method :new, :process_response, :create_optin
   end
 end

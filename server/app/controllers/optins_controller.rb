@@ -6,17 +6,19 @@ class OptinsController < Rack::API
 			optin 
 		else 
 			self.instance_variable_set(:@status, 404)
-			"optin with given #{params["email"]} email is not found"
+			message = "optin with given #{params["email"]} email is not found"
+			message.tap { |x| puts x }
 		end
 	end
 
 	post 'markets' do
 		optin = Optin.create(params[:params])
 		if optin.valid? 
+			self.instance_variable_set(:@status, 200)
 			optin 
 		else
 			self.instance_variable_set(:@status, 422)
-			optin.errors.first.join(' ')
+			optin.errors.first.join(' ').tap { |x| puts x }
 		end
 	end
 
@@ -30,11 +32,12 @@ class OptinsController < Rack::API
 				optin
 			else
 				self.instance_variable_set(:@status, 422)
-				optin.errors.first.join(' ')
+				optin.errors.first.join(' ').tap { |x| puts x }
 			end
 		else
 			self.instance_variable_set(:@status, 404)
-			"optin with given #{params["email"]} email is not found"
+			message = "optin with given #{params["email"]} email is not found"
+			message.tap { |x| puts x }
 		end
 	end
 end
