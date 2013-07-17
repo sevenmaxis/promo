@@ -33,7 +33,7 @@ module Promo
           RestClient.post(@@url, :params => params) do |response, request, result, &block|
             if 200 == response.code
               response
-            elsif 422 == response.code
+            elsif [404, 422].include? response.code
               [response.code, response]
             else
               response.return!(request, result, &block)
@@ -50,7 +50,7 @@ module Promo
           RestClient.put(@@url+'/1', options) do |response, request, result, &block|
             if 200 == response.code
               response
-            elsif 422 == response.code
+            elsif [404, 422].include? response.code
               [response.code, response]
             else
               response.return!(request, result, &block)
@@ -63,7 +63,7 @@ module Promo
         resp = yield
         if [200, 201].include? resp.code
           ['success', resp.body]
-        elsif resp.code == 422
+        elsif [404, 422].include? resp.code
           ['error'. resp.body]
         else
           ['error', "unrecognized error,\nhttp code: #{resp.code},\nhttp body: #{resp.body}"]
