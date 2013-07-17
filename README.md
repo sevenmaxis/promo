@@ -1,0 +1,1 @@
+curl -X POST -d '{"market":{ :email => "ben.fresh@gmail.com", :mobile => "+38077777777777", :first_name => "vasia", :last_name => "ivanov", :permission_type => "one-time", :channel => "email", :company_name => "melkisoft"}}' http://localhost:9292/markets

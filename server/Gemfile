@@ -1,0 +1,16 @@
+source 'https://rubygems.org'
+
+#gem 'json'
+gem 'rack-api'
+gem 'mongoid', '3.0.20'
+
+group :test do
+  gem 'rack-test'
+  gem 'rspec'
+  gem 'debugger'
+  gem 'mongoid-rspec'
+  gem 'database_cleaner'
+end
+
+# Bundle edge Rails instead:
+# gem 'rails', :git => 'git://github.com/rails/rails.git'
