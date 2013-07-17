@@ -20,8 +20,19 @@ module Promo
       end
 
       def get(email)
-        # '/1' is a fake id to follow REST convention
-        create_optin( *process_request { RestClient.get(@@url+'/1', params: {email: email}) })
+        resp = process_request do 
+          # '/1' is a fake id to follow REST convention
+          RestClient.get(@@url+'/1', params: {email: email}) do |response, request, result, &block|
+            if 200 == response.code
+              response
+            elsif [404, 422].include? response.code
+              [response.code, response]
+            else
+              response.return!(request, result, &block)
+            end
+          end
+        end
+        create_optin *resp
       end
 
       def create(email, mobile, first_name, last_name, permission_type, channel, company_name)
@@ -44,9 +55,9 @@ module Promo
       end
 
       def update(email, params)
-        # '/1' is a fake id to follow REST convention
         process_request do
           options = {params: {email: email, params: params}}
+          # '/1' is a fake id to follow REST convention
           RestClient.put(@@url+'/1', options) do |response, request, result, &block|
             if 200 == response.code
               response

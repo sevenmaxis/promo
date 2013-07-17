@@ -36,6 +36,15 @@ describe Promo do
 			optin.channel.should == channel
 			optin.company_name.should == company_name
 		end
+
+		it "not get optin" do
+			stub_request(:get, "http://localhost:9292/markets/1?email=test@test.com")
+				.to_return(:body => "not found", :status => 404)
+
+			optin = Promo::Optin.get(email)
+			optin.status.should == 'error'
+			optin.message.should match /not found/
+		end
 	end
 
 	describe "#create" do
