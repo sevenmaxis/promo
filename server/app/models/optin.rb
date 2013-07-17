@@ -1,4 +1,4 @@
-class Market
+class Optin
   include Mongoid::Document
   
   field :email,      			:type => String
@@ -16,4 +16,6 @@ class Market
 
   validates_inclusion_of :permission_type, in: ['one-time', 'permanent']
   validates_inclusion_of :channel, in: ['sms', 'email', 'sms+email']
+
+  validates_length_of :mobile, :first_name, :last_name, :company_name, minimum: 1, maximum: 256
 end

@@ -1,1 +1,2 @@
-options: --color --format d
+--color
+--format progress

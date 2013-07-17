@@ -10,7 +10,7 @@ end
 
 require "rack/api"
 require 'initializers/boot'
-require 'controllers/markets_controller'
-require 'models/market'
+require 'controllers/optins_controller'
+require 'models/optin'
 
 
